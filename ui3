@@ -2365,29 +2365,21 @@ Tab.addTextBox = Tab.addTextbox
 Tab.addMultiDropDown = Tab.addMultiDropdown
 Tab.addDropDown = Tab.addDropdown
 
--- Default TANG HUB menu. Set getgenv().TangHubLibraryOnly = true before loading to skip it.
+-- Empty TANG HUB window. Add your own tabs through Library.window. Set getgenv().TangHubLibraryOnly = true to skip it.
 local function buildMenu()
 	local environment = getgenv and getgenv() or _G
 	local window = Library.new({ Title = "TANG HUB", Subtitle = "Script Hub", Logo = environment.TangHubLogo })
-	local tabs = {}
-
-	window:addSection("Main")
-	tabs.autoFarm = window:addTab({ Name = "Auto Farm" })
-	tabs.autoRefine = window:addTab({ Name = "Auto Refine" })
-	tabs.shop = window:addTab({ Name = "Shop" })
-	tabs.quests = window:addTab({ Name = "Quests" })
-	tabs.events = window:addTab({ Name = "Events" })
-
-	window:addSection("Tools")
-	tabs.inventory = window:addTab({ Name = "Inventory" })
-	tabs.party = window:addTab({ Name = "Party" })
-	tabs.player = window:addTab({ Name = "Player" })
-
-	tabs.settings = window:addSettings()
-	tabs.credits = window:addCredits("TANG HUB")
-
 	Library.window = window
-	Library.tabs = tabs
+	Library.tabs = {}
+
+	-- Settings and Credits are added last so your own tabs stay on top.
+	task.defer(function()
+		window:addSettings()
+		window:addCredits("TANG HUB")
+		if not window.currentTab and window.tabs[1] then
+			window:selectTab(window.tabs[1])
+		end
+	end)
 end
 
 local getEnvironment = getgenv or function()
@@ -2401,10 +2393,9 @@ if not getEnvironment().TangHubLibraryOnly then
 end
 
 -- ===== YOUR FEATURES (add below) =====
-local tabs = Library.tabs
-if tabs then
-	tabs.autoFarm:addGroup({ Title = "Farming Configuration", Description = "Choose how to farm" })
-	tabs.autoFarm:addToggle({ Name = "Auto Farm", Callback = function(state) end })
-end
+-- local window = Library.window
+-- local mainTab = window:addTab({ Name = "Main" })
+-- mainTab:addGroup({ Title = "Example", Description = "Description" })
+-- mainTab:addToggle({ Name = "Example", Callback = function(state) end })
 
 return Library
